@@ -104,16 +104,8 @@ export function AdminProductFormPage() {
 
     setUploading(true)
     try {
-      // Check if bucket exists first
-      const { data: buckets } = await supabase.storage.listBuckets()
-      const bucketExists = buckets?.some(b => b.name === 'product-images')
-
-      if (!bucketExists) {
-        alert('Storage bucket "product-images" does not exist. Please create it in Supabase dashboard.')
-        setUploading(false)
-        return
-      }
-
+      // Do not call listBuckets here: Supabase intentionally restricts bucket
+      // listing, so a valid bucket can look missing to the browser client.
       for (const file of files) {
         const fileExt = file.name.split('.').pop()
         const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`

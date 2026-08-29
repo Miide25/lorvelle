@@ -174,8 +174,9 @@ export function CheckoutPage() {
         addToast('Order placed, but the store WhatsApp number is invalid.', 'error')
       }
     } catch (error) {
-      console.error('Error creating order:', error)
-      addToast('Failed to place order. Please try again.', 'error')
+      console.error('[v0] Error creating order:', error)
+      const message = error instanceof Error ? error.message : 'Unknown checkout error'
+      addToast(`Failed to place order: ${message}`, 'error')
     } finally {
       setLoading(false)
     }
