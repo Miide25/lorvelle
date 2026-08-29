@@ -8,6 +8,7 @@ import { Navbar } from './components/store/Navbar'
 import { Footer } from './components/store/Footer'
 import { Toast } from './components/ui/Toast'
 import { LoadingScreen } from './components/LoadingScreen'
+import { InstallPrompt } from './components/InstallPrompt'
 
 // Store pages
 import { HomePage } from './pages/store/HomePage'
@@ -125,6 +126,7 @@ function App() {
           <ToastProvider>
             <AppRoutes />
             <Toast />
+            <InstallPrompt />
           </ToastProvider>
         </CartProvider>
       </AuthProvider>

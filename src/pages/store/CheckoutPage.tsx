@@ -169,18 +169,17 @@ export function CheckoutPage() {
         .update({ whatsapp_message: whatsappMessage })
         .eq('id', order.id)
 
-      // Open WhatsApp
-      openWhatsApp(settings?.whatsapp_number || '', whatsappMessage)
+      // Open WhatsApp. Direct navigation is intentional: popup blockers commonly
+      // reject window.open after the async order request has completed.
+      const whatsappOpened = openWhatsApp(settings?.whatsapp_number || '', whatsappMessage)
 
-      // Clear cart
       clearCart()
 
-      addToast('Order placed successfully! Check your WhatsApp.', 'success')
-
-      // Redirect to home
-      setTimeout(() => {
-        navigate('/')
-      }, 2000)
+      if (whatsappOpened) {
+        addToast('Order placed successfully! Opening WhatsApp.', 'success')
+      } else {
+        addToast('Order placed, but the store WhatsApp number is invalid.', 'error')
+      }
     } catch (error) {
       console.error('Error creating order:', error)
       addToast('Failed to place order. Please try again.', 'error')
