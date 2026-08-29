@@ -18,7 +18,13 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
   }
 
   if (!user || !isAdmin) {
-    return <Navigate to="/admin/login" state={{ from: location }} replace />
+    return (
+      <Navigate
+        to="/admin/login"
+        state={{ from: { pathname: location.pathname, search: location.search, hash: location.hash } }}
+        replace
+      />
+    )
   }
 
   return <>{children}</>

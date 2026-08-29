@@ -13,7 +13,10 @@ export function AdminLoginPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
 
-  const from = (location.state as any)?.from?.pathname || '/admin'
+  const redirectLocation = (location.state as { from?: { pathname?: string; search?: string; hash?: string } } | null)?.from
+  const from = redirectLocation
+    ? `${redirectLocation.pathname || '/admin'}${redirectLocation.search || ''}${redirectLocation.hash || ''}`
+    : '/admin'
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

@@ -67,14 +67,18 @@ export function encodeWhatsAppMessage(message: string): string {
 
 export function generateWhatsAppURL(phoneNumber: string, message: string): string {
   const encodedMessage = encodeWhatsAppMessage(message)
-  // Remove non-numeric characters from phone number
   const cleanPhone = phoneNumber.replace(/\D/g, '')
   return `https://wa.me/${cleanPhone}?text=${encodedMessage}`
 }
 
-export function openWhatsApp(phoneNumber: string, message: string): void {
-  const url = generateWhatsAppURL(phoneNumber, message)
-  window.open(url, '_blank')
+export function openWhatsApp(phoneNumber: string, message: string): boolean {
+  const cleanPhone = phoneNumber.replace(/\D/g, '')
+  if (cleanPhone.length < 10 || cleanPhone.length > 15) return false
+
+  const url = generateWhatsAppURL(cleanPhone, message)
+  // Navigating directly avoids popup blockers after the async order request.
+  window.location.assign(url)
+  return true
 }
 
 export function validateWhatsAppCheckout(

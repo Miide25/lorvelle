@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { LayoutDashboard, Package, Tag, ShoppingCart, Users, Percent, Settings, LogOut, Store } from 'lucide-react'
+import { LayoutDashboard, Package, Tag, ShoppingCart, Users, Percent, Settings, LogOut, Store, X } from 'lucide-react'
 import { useAuth } from '../../contexts/AuthContext'
 
 interface NavItem {
@@ -19,7 +19,12 @@ const navItems: NavItem[] = [
   { path: '/admin/settings', label: 'Settings', icon: Settings },
 ]
 
-export function AdminSidebar() {
+interface AdminSidebarProps {
+  open: boolean
+  onClose: () => void
+}
+
+export function AdminSidebar({ open, onClose }: AdminSidebarProps) {
   const location = useLocation()
   const { signOut } = useAuth()
 
@@ -29,7 +34,10 @@ export function AdminSidebar() {
   }
 
   return (
-    <aside className="w-64 bg-gray-900 text-white min-h-screen fixed left-0 top-0">
+    <aside className={`fixed inset-y-0 left-0 z-50 flex w-64 max-w-[85vw] flex-col bg-gray-900 text-white transition-transform duration-200 lg:translate-x-0 ${open ? 'translate-x-0' : '-translate-x-full'}`}>
+      <button type="button" onClick={onClose} aria-label="Close admin menu" className="absolute right-3 top-3 rounded p-2 text-gray-400 hover:bg-gray-800 hover:text-white lg:hidden">
+        <X className="h-5 w-5" />
+      </button>
       <div className="p-6">
         <Link to="/admin" className="flex items-center gap-3">
           <Store className="w-8 h-8 text-pink-400" />
@@ -49,6 +57,7 @@ export function AdminSidebar() {
             <Link
               key={item.path}
               to={item.path}
+              onClick={onClose}
               className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
                 isActive
                   ? 'bg-pink-600 text-white'

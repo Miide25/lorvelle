@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Menu } from 'lucide-react'
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom'
 import { AuthProvider } from './contexts/AuthContext'
 import { CartProvider } from './contexts/CartContext'
@@ -8,6 +9,7 @@ import { Navbar } from './components/store/Navbar'
 import { Footer } from './components/store/Footer'
 import { Toast } from './components/ui/Toast'
 import { LoadingScreen } from './components/LoadingScreen'
+import { InstallPrompt } from './components/InstallPrompt'
 
 // Store pages
 import { HomePage } from './pages/store/HomePage'
@@ -60,11 +62,20 @@ function StoreLayout() {
 }
 
 function AdminLayout() {
+  const [menuOpen, setMenuOpen] = useState(false)
+
   return (
-    <div className="flex min-h-screen bg-gray-100">
-      <AdminSidebar />
-      <main className="flex-1 ml-64">
-        <Outlet />
+    <div className="flex min-h-screen min-w-0 bg-gray-100">
+      <AdminSidebar open={menuOpen} onClose={() => setMenuOpen(false)} />
+      {menuOpen && <button type="button" aria-label="Close admin menu" onClick={() => setMenuOpen(false)} className="fixed inset-0 z-40 bg-black/40 lg:hidden" />}
+      <main className="min-w-0 flex-1 lg:ml-64">
+        <div className="sticky top-0 z-30 flex items-center gap-3 border-b border-gray-200 bg-white px-4 py-3 lg:hidden">
+          <button type="button" aria-label="Open admin menu" onClick={() => setMenuOpen(true)} className="rounded-md p-2 text-gray-700 hover:bg-gray-100">
+            <Menu className="h-6 w-6" />
+          </button>
+          <span className="font-semibold text-gray-900">Lorvelle Admin</span>
+        </div>
+        <div className="min-w-0 overflow-x-hidden"><Outlet /></div>
       </main>
     </div>
   )
@@ -125,6 +136,7 @@ function App() {
           <ToastProvider>
             <AppRoutes />
             <Toast />
+            <InstallPrompt />
           </ToastProvider>
         </CartProvider>
       </AuthProvider>
