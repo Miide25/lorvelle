@@ -110,10 +110,25 @@ export function CheckoutPage() {
     try {
       const orderNumber = generateOrderNumber()
 
-      // Create order
-      const { data: order, error: orderError } = await supabase
+      const whatsappMessage = createWhatsAppMessage(
+        orderNumber,
+        cart,
+        subtotal,
+        deliveryFee,
+        total,
+        formData.fullName,
+        formData.phone,
+        formData.address,
+        formData.deliveryInstructions
+      )
+      const orderId = crypto.randomUUID()
+
+      // Do not select the inserted row: guest checkout has INSERT permission,
+      // but must not be granted permission to read customer orders.
+      const { error: orderError } = await supabase
         .from('orders')
         .insert({
+          id: orderId,
           order_number: orderNumber,
           customer_name: formData.fullName,
           customer_phone: formData.phone,
@@ -126,16 +141,13 @@ export function CheckoutPage() {
           delivery_fee: deliveryFee,
           total,
           status: 'pending',
-          whatsapp_message: '', // Will be updated below
+          whatsapp_message: whatsappMessage,
         })
-        .select()
-        .single()
 
       if (orderError) throw orderError
 
-      // Create order items
       const orderItems = cart.map((item) => ({
-        order_id: order.id,
+        order_id: orderId,
         product_id: item.productId,
         product_name: item.productName,
         quantity: item.quantity,
@@ -149,25 +161,6 @@ export function CheckoutPage() {
         .insert(orderItems)
 
       if (itemsError) throw itemsError
-
-      // Generate WhatsApp message
-      const whatsappMessage = createWhatsAppMessage(
-        orderNumber,
-        cart,
-        subtotal,
-        deliveryFee,
-        total,
-        formData.fullName,
-        formData.phone,
-        formData.address,
-        formData.deliveryInstructions
-      )
-
-      // Update order with WhatsApp message
-      await supabase
-        .from('orders')
-        .update({ whatsapp_message: whatsappMessage })
-        .eq('id', order.id)
 
       // Open WhatsApp. Direct navigation is intentional: popup blockers commonly
       // reject window.open after the async order request has completed.
